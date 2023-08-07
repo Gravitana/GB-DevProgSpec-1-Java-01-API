@@ -1,7 +1,6 @@
 package lesson05;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Homework {
     /**
@@ -26,17 +25,53 @@ public class Homework {
      * 5 -> [текст, нужен, чтобы, несет, набор]
      * ...
      */
-    static void printStats(String text) {
+    static void printStats(String text, Boolean includeHyphen) {
         // 1. Split текста, приведение его к нижнему регистру, удаление запятых и точек.
         // 2. Сбор структуры со статистикой.
-        Map<Integer, List<String>> stats; // Структура, в которой ключ - длина слова, значение - список таких слов.
+        Map<Integer, List<String>> stats = new HashMap<>(); // Структура, в которой ключ - длина слова, значение - список таких слов.
+
+        String tempTest = text.toLowerCase()
+                .replaceAll("[,.]", "")
+                .replace(" - ", " ")
+                .replaceAll("\\s+", " ");
+
+        String[] mas = tempTest.split(" ");
+
+        for (String word: mas) {
+            int len = word.length();
+
+            if (!includeHyphen && word.contains("-"))
+                len -= 1;
+
+            List<String> strList = stats.get(len);
+
+            if (strList == null)
+                strList = new LinkedList<>();
+
+            if (!strList.contains(word)) {
+                strList.add(word);
+                stats.put(len, strList);
+            }
+
+            stats.put(len, strList);
+        }
+
+        for (Map.Entry<Integer, List<String>> entry : stats.entrySet()) {
+            Integer key = entry.getKey();
+            List<String> value = entry.getValue();
+            System.out.println(key + " -> " + value);
+        }
+
     }
 
     public static void main(String[] args) {
-        String text = "Это мой первый текст. Он состоит из каких-то тестовых слов и нужен для того, чтобы выполнить тестовое задание GB. " +
+        String text = "Это - мой первый текст. Он состоит из каких-то тестовых слов и нужен для того, чтобы выполнить тестовое задание GB. " +
                 "Данный текст не несет в себе какого-либо смысла, он просто содержит набор слов.";
 
-        printStats(text);
-    }
+        Scanner console = new Scanner(System.in);
+        System.out.print("Включать дефис в длину слова? 0-Нет: ");
+        int hyphen = console.nextInt();
 
+        printStats(text, hyphen != 0);
+    }
 }
